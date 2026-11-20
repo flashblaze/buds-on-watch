@@ -30,7 +30,7 @@ Unofficial. Not affiliated with OnePlus, OPPO or HeyMelody.
    ./gradlew :app:installDebug
    ```
 
-3. Open **Buds ANC** on the watch and allow *Nearby devices*.
+3. Open **Buds on Watch** on the watch and allow *Nearby devices*.
 4. Optional: add the **Noise control** tile from the tile list.
 
 The app picks the first paired device named "OnePlus Buds"; *Choose buds* at the bottom of the screen selects another paired headset.
@@ -43,7 +43,7 @@ OnePlus and OPPO earbuds take app commands over a **Bluetooth Classic serial lin
 
 ```mermaid
 flowchart LR
-  W[Galaxy Watch<br/>Buds ANC] -- "RFCOMM, service 079A, channel 15<br/>commands + replies + pushes" --> B[OnePlus Buds Pro 3]
+  W[Galaxy Watch<br/>Buds on Watch] -- "RFCOMM, service 079A, channel 15<br/>commands + replies + pushes" --> B[OnePlus Buds Pro 3]
   P[Phone<br/>HeyMelody] -- "its own RFCOMM link" --> B
   P -- "A2DP audio" --> B
 ```

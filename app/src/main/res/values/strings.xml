@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Buds ANC</string>
+    <string name="app_name">Buds on Watch</string>
 
     <string name="mode_off">Off</string>
     <string name="mode_anc">Noise cancelling</string>
