@@ -38,6 +38,7 @@
     <string name="tile_off">Off</string>
     <string name="tile_anc">ANC</string>
     <string name="tile_transparency">Trans</string>
+    <string name="tile_level_medium">Mid</string>
     <string name="tile_open_app">Open the app to connect</string>
     <string name="tile_unreachable">Buds not reachable</string>
 </resources>

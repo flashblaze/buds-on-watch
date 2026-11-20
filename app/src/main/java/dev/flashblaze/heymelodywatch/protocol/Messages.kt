@@ -6,6 +6,7 @@ package dev.flashblaze.heymelodywatch.protocol
  */
 object Cmd {
     const val HANDSHAKE = 0x0100 // -> 00 <command bitmap, LSB first>
+    const val PRODUCT_ID = 0x0103 // -> 00 <id, 3 bytes LE> [extra bytes on some models]
     const val OFFERED_EVENTS = 0x0200 // -> 00 <count> <event codes>
     const val SUBSCRIBE_ONE = 0x0201 // <code>, for buds without 0x0205
     const val PUSH = 0x0204 // from the buds, seq FF: <event code> ...
@@ -65,6 +66,12 @@ object Decode {
     fun hasCommandBit(handshake: ByteArray, bit: Int): Boolean {
         val i = 1 + bit / 8
         return i < handshake.size && (handshake[i].toInt() shr (bit % 8)) and 1 == 1
+    }
+
+    /** `0x8103` payload `00 <id LE>` -> `"064014"`; only the first 3 id bytes count. */
+    fun productId(payload: ByteArray): String? {
+        if (payload.size < 4 || payload[0].toInt() != 0) return null
+        return "%02X%02X%02X".format(payload[3].toInt() and 0xFF, payload[2].toInt() and 0xFF, payload[1].toInt() and 0xFF)
     }
 
     /** `0x8200` payload `00 <count> <codes>`. */

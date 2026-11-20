@@ -95,4 +95,15 @@ class ProtocolTest {
         assertEquals("03 01 02 03", Payloads.subscribe(listOf(0x01, 0x02, 0x03)).toHex())
         assertEquals("03 02 01 03", Payloads.subscribe(listOf(0x02, 0x01)).toHex())
     }
+
+    @Test
+    fun `product id selects the level table`() {
+        assertEquals("065414", Decode.productId(hex("00 14 54 06"))) // OnePlus Buds 4 capture
+        val pro3 = Decode.productId(hex("00 14 40 06"))
+        assertEquals(Models.BUDS_PRO_3, pro3)
+        assertEquals(listOf(AncLevel.SMART, AncLevel.DEEP, AncLevel.MEDIUM, AncLevel.LIGHT), Models.levels(pro3))
+        // Unknown model: no level bits are offered.
+        assertTrue(Models.levels("065414").isEmpty())
+        assertNull(Decode.productId(hex("01 14 40 06")))
+    }
 }

@@ -39,6 +39,9 @@ data class NoiseState(val mode: NoiseMode, val level: AncLevel? = null) {
     /** The bit to SET for this state: a level's own bit, else the mode's. */
     val setBit: Int get() = level?.setBit ?: mode.setBit
 
+    /** Stable name for storage and tile click ids: the level's name, else the mode's. */
+    val key: String get() = level?.name ?: mode.name
+
     companion object {
         /** Decodes a REPORT mask by its lowest set bit; null for a bit this model does not have. */
         fun fromReport(mask: Int): NoiseState? {
@@ -61,5 +64,24 @@ data class NoiseState(val mode: NoiseMode, val level: AncLevel? = null) {
             val bit = Integer.numberOfTrailingZeros(mask)
             return AncLevel.entries.firstOrNull { it != AncLevel.SMART && it.setBit == bit }
         }
+
+        fun fromKey(key: String?): NoiseState? {
+            AncLevel.entries.firstOrNull { it.name == key }?.let { return NoiseState(NoiseMode.ANC, it) }
+            return NoiseMode.entries.firstOrNull { it.name == key }?.let { NoiseState(it) }
+        }
+    }
+}
+
+/**
+ * ANC levels per product id (`0x8103`). The buds do not list their levels; HeyMelody keeps a
+ * per-model table, and a wrong bit silently sets another mode, so unknown models get no levels.
+ */
+object Models {
+    const val BUDS_PRO_3 = "064014"
+
+    fun levels(productId: String?): List<AncLevel> = when (productId) {
+        // HeyMelody's tree for 064014: noise reduction -> Smart 7, Deep 4, Medium 5, Light 6.
+        BUDS_PRO_3 -> listOf(AncLevel.SMART, AncLevel.DEEP, AncLevel.MEDIUM, AncLevel.LIGHT)
+        else -> emptyList()
     }
 }

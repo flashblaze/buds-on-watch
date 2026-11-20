@@ -12,6 +12,14 @@ fun AncLevel.labelRes(): Int = when (this) {
     AncLevel.LIGHT -> R.string.level_light
 }
 
+/** Short names for the tile's level pills. */
+fun AncLevel.tileLabelRes(): Int = when (this) {
+    AncLevel.SMART -> R.string.level_smart
+    AncLevel.DEEP -> R.string.level_deep
+    AncLevel.MEDIUM -> R.string.tile_level_medium
+    AncLevel.LIGHT -> R.string.level_light
+}
+
 fun NoiseMode.labelRes(): Int = when (this) {
     NoiseMode.OFF -> R.string.mode_off
     NoiseMode.ANC -> R.string.mode_anc

@@ -14,7 +14,7 @@ import dev.flashblaze.heymelodywatch.protocol.AncLevel
 import dev.flashblaze.heymelodywatch.protocol.Cmd
 import dev.flashblaze.heymelodywatch.protocol.Decode
 import dev.flashblaze.heymelodywatch.protocol.Event
-import dev.flashblaze.heymelodywatch.protocol.NoiseMode
+import dev.flashblaze.heymelodywatch.protocol.Models
 import dev.flashblaze.heymelodywatch.protocol.NoiseState
 import dev.flashblaze.heymelodywatch.protocol.Payloads
 import dev.flashblaze.heymelodywatch.protocol.Status
@@ -60,6 +60,8 @@ data class BudsState(
     val noise: NoiseState? = null,
     /** The level Smart picked, while the mode is Smart. */
     val smartPick: AncLevel? = null,
+    /** ANC levels this model has, from its product id; empty until known or for other models. */
+    val levels: List<AncLevel> = emptyList(),
     /** A mode change in flight. */
     val pending: NoiseState? = null,
     val notice: Notice? = null,
@@ -77,7 +79,7 @@ class Buds private constructor(private val context: Context) {
     private val prefs = context.getSharedPreferences("buds", Context.MODE_PRIVATE)
     private val setLock = Mutex()
 
-    private val _state = MutableStateFlow(BudsState(noise = lastKnown()))
+    private val _state = MutableStateFlow(BudsState(noise = lastKnown(), levels = Models.levels(productId())))
     val state: StateFlow<BudsState> = _state
 
     private var users = 0
@@ -183,6 +185,13 @@ class Buds private constructor(private val context: Context) {
         // A bitmap long enough to hold the ANC bit, without it: no noise control on these buds.
         if (handshake.size > 1 + Cmd.BIT_ANC / 8 && !Decode.hasCommandBit(handshake, Cmd.BIT_ANC)) {
             return Link.UNSUPPORTED
+        }
+        delay(200)
+        val product = l.request(Cmd.PRODUCT_ID)?.let { Decode.productId(it.payload) }
+        Log.d(BudsLink.TAG, "product id $product")
+        if (product != null) {
+            prefs.edit().putString(KEY_PRODUCT, product).apply()
+            _state.update { it.copy(levels = Models.levels(product)) }
         }
         delay(200)
         val offered = l.request(Cmd.OFFERED_EVENTS)?.let { Decode.offeredEvents(it.payload) }
@@ -298,22 +307,20 @@ class Buds private constructor(private val context: Context) {
     // ---- Last known mode, for the tile and the next launch ----
 
     private fun remember(noise: NoiseState) {
-        val value = noise.level?.name ?: noise.mode.name
-        if (prefs.getString(KEY_MODE, null) == value) return
-        prefs.edit().putString(KEY_MODE, value).apply()
+        if (prefs.getString(KEY_MODE, null) == noise.key) return
+        prefs.edit().putString(KEY_MODE, noise.key).apply()
         TileService.getUpdater(context).requestUpdate(NoiseTileService::class.java)
     }
 
-    private fun lastKnown(): NoiseState? = when (val v = prefs.getString(KEY_MODE, null)) {
-        null -> null
-        in NoiseMode.entries.map { it.name } -> NoiseState(NoiseMode.valueOf(v))
-        in AncLevel.entries.map { it.name } -> NoiseState(NoiseMode.ANC, AncLevel.valueOf(v))
-        else -> null
-    }
+    private fun lastKnown(): NoiseState? = NoiseState.fromKey(prefs.getString(KEY_MODE, null))
+
+    /** Product id of the buds last connected, e.g. `064014`. */
+    fun productId(): String? = prefs.getString(KEY_PRODUCT, null)
 
     companion object {
         private const val KEY_ADDRESS = "address"
         private const val KEY_MODE = "mode"
+        private const val KEY_PRODUCT = "product"
         private const val IDLE_CLOSE_MS = 5_000L
         private const val AWAIT_LINK_MS = 30_000L
         private const val RECONNECT_DELAY_MS = 2_000L

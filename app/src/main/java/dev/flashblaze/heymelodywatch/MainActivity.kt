@@ -163,18 +163,19 @@ private fun TransformingLazyColumnScope.modeItems(
         }
     }
 
-    if (reported?.mode != NoiseMode.ANC) return
+    // Always listed, so a level is one tap from any mode: picking one turns noise cancelling on at it.
+    if (state.levels.isEmpty()) return
     item { ListHeader { Text(stringResource(R.string.anc_level)) } }
-    for (level in AncLevel.entries) {
+    for (level in state.levels) {
         item {
             val secondary: String? = when {
                 state.pending?.level == level -> stringResource(R.string.switching)
-                level == AncLevel.SMART && reported.level == AncLevel.SMART && state.smartPick != null ->
+                level == AncLevel.SMART && reported?.level == AncLevel.SMART && state.smartPick != null ->
                     stringResource(R.string.smart_picked, stringResource(state.smartPick.labelRes()))
                 else -> null
             }
             RadioButton(
-                selected = reported.level == level,
+                selected = reported?.level == level,
                 onSelect = { set(NoiseState(NoiseMode.ANC, level)) },
                 enabled = idle,
                 modifier = Modifier.fillMaxWidth(),
