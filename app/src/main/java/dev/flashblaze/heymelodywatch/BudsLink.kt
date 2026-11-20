@@ -59,7 +59,7 @@ class BudsLink private constructor(
                 for (frame in framer.feed(chunk, n)) {
                     Log.d(TAG, "rx $frame")
                     // State first, so a request() caller that resumes on the reply sees it.
-                    Decode.anc(frame)?.let(onEvent)
+                    Decode.event(frame)?.let(onEvent)
                     pending.remove(key(frame.cmd, frame.seq))?.complete(frame)
                 }
             }

@@ -5,7 +5,7 @@
     <string name="mode_anc">Noise cancelling</string>
     <string name="mode_transparency">Transparency</string>
     <string name="level_smart">Smart</string>
-    <string name="level_deep">Deep</string>
+    <string name="level_high">High</string>
     <string name="level_medium">Medium</string>
     <string name="level_light">Light</string>
     <string name="anc_with_level">Noise cancelling · %1$s</string>
@@ -16,7 +16,17 @@
 
     <string name="buds">Buds</string>
     <string name="connecting">Connecting…</string>
-    <string name="last_known">Last known: %1$s</string>
+    <string name="connected">Connected</string>
+    <string name="battery_left">L</string>
+    <string name="battery_right">R</string>
+    <string name="battery_case">Case</string>
+    <string name="battery_unknown">–</string>
+    <string name="battery_percent">%1$d%%</string>
+    <string name="battery_description">%1$s battery %2$d percent</string>
+    <string name="battery_charging_description">%1$s battery %2$d percent, charging</string>
+    <string name="battery_left_long">Left bud</string>
+    <string name="battery_right_long">Right bud</string>
+    <string name="battery_case_long">Case</string>
     <string name="no_permission">Allow Nearby devices so the watch can talk to your buds</string>
     <string name="allow">Allow</string>
     <string name="open_settings">Settings</string>

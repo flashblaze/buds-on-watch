@@ -7,7 +7,7 @@ import dev.flashblaze.heymelodywatch.protocol.NoiseState
 
 fun AncLevel.labelRes(): Int = when (this) {
     AncLevel.SMART -> R.string.level_smart
-    AncLevel.DEEP -> R.string.level_deep
+    AncLevel.HIGH -> R.string.level_high
     AncLevel.MEDIUM -> R.string.level_medium
     AncLevel.LIGHT -> R.string.level_light
 }
@@ -15,7 +15,7 @@ fun AncLevel.labelRes(): Int = when (this) {
 /** Short names for the tile's level pills. */
 fun AncLevel.tileLabelRes(): Int = when (this) {
     AncLevel.SMART -> R.string.level_smart
-    AncLevel.DEEP -> R.string.level_deep
+    AncLevel.HIGH -> R.string.level_high
     AncLevel.MEDIUM -> R.string.tile_level_medium
     AncLevel.LIGHT -> R.string.level_light
 }

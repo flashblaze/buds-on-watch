@@ -1,6 +1,6 @@
 # Hey Melody Watch: noise control for OnePlus Buds Pro 3 on Galaxy Watch 8
 
-Scope: one feature. Read and set the noise-control mode (Off / Transparency / ANC + ANC level) of OnePlus Buds Pro 3 from a Galaxy Watch 8. Nothing else (no EQ, gestures, battery beyond what is free).
+Scope: read and set the noise-control mode (Off / Transparency / ANC + ANC level) of OnePlus Buds Pro 3 from a Galaxy Watch 8, and show left / right / case battery. Nothing else (no EQ, gestures).
 
 ## 0. Existing app: try it first
 
@@ -9,8 +9,8 @@ Scope: one feature. Read and set the noise-control mode (Off / Transparency / AN
 - Its OPPO/OnePlus driver (`oppo/OppoOpoClient.java`) matches any Bluetooth name containing `oneplus`, so Buds Pro 3 will be picked up.
 - Verified models: OPPO Enco Air5 Pro, Enco Free4. **Buds Pro 3: not verified.**
 - Gaps for Buds Pro 3, read from source `[INFERENCE, not run]`:
-  - Only 3 states: Off / ANC / Transparency. No level choice (Smart, Deep, Medium, Light).
-  - `OppoProtocol.noiseMode()` treats only report bits `0x02` and `0x10` as ANC. Buds Pro 3 report Medium `0x20`, Light `0x40`, Smart `0x80`, so the current mode shows as unknown when ANC is on at those levels. Deep (`0x10`) displays correctly.
+  - Only 3 states: Off / ANC / Transparency. No level choice (Smart, High, Medium, Light).
+  - `OppoProtocol.noiseMode()` treats only report bits `0x02` and `0x10` as ANC. Buds Pro 3 report Medium `0x20`, Light `0x40`, Smart `0x80`, so the current mode shows as unknown when ANC is on at those levels. High (`0x10`) displays correctly.
   - Writing still works: it sends `0x0404 01 01 02`, which is ANC at the last-used level.
 
 Test it: `adb install -r wearears-debug.apk` to the watch (wireless debugging, section 6). If it is good enough, stop here, or send it a ~10-line PR adding the levels.
@@ -72,7 +72,7 @@ SET bits (what we write) differ from REPORT bits (what the buds answer).
 | Off | `01 01 01` | `0x0008` |
 | ANC, last level | `01 01 02` | level bit, or `0x0002` |
 | Transparency | `01 01 04` | `0x0100` |
-| ANC Deep | `01 01 10` | `0x0010` |
+| ANC High | `01 01 10` | `0x0010` |
 | ANC Medium | `01 01 20` | `0x0020` |
 | ANC Light | `01 01 40` | `0x0040` |
 | ANC Smart | `01 01 80` | `0x0080` (+ `03 04 01` push naming the level it picked) |
@@ -93,7 +93,9 @@ One Gradle module, `:app` (`dev.flashblaze.heymelodywatch`). Reference implement
 | `MainActivity.kt` | Compose for Wear: header, Noise cancelling / Transparency / Off radios, ANC level radios (Smart shows its pick), buds picker, permission / Bluetooth-off / not-paired / failed screens |
 | `NoiseTileService.kt` | Off / ANC / Trans buttons as `LoadAction`s; `onTileRequest` runs a session, sets, reads back, redraws. Title opens the app |
 
-Out of scope: battery, EQ, gestures, phone app, Play Store release.
+Battery: `0x0106` read at connect → `00 <count> (<part> <raw>)*`, then push `01 <count> (<part> <raw>)*`; part 1 left, 2 right, 3 case; level = raw & 7F, bit 7 charging, FF unknown. The case is only reported while its lid is open; a part missing from a report keeps its last value, dimmed. Last readings persist for the next launch.
+
+Out of scope: EQ, gestures, phone app, Play Store release.
 
 ## 5. Build order
 

@@ -1,12 +1,13 @@
 package dev.flashblaze.heymelodywatch.protocol
 
 /**
- * The noise-control subset of the protocol (QuickBuds docs/PROTOCOL.md §5, §6, §10, §14).
+ * The noise-control and battery subset of the protocol (QuickBuds docs/PROTOCOL.md §5, §6, §10, §14).
  * A reply's command is the request's with bit 15 set; it echoes the request's seq.
  */
 object Cmd {
     const val HANDSHAKE = 0x0100 // -> 00 <command bitmap, LSB first>
     const val PRODUCT_ID = 0x0103 // -> 00 <id, 3 bytes LE> [extra bytes on some models]
+    const val BATTERY = 0x0106 // -> 00 <count> (<part> <raw>)*
     const val OFFERED_EVENTS = 0x0200 // -> 00 <count> <event codes>
     const val SUBSCRIBE_ONE = 0x0201 // <code>, for buds without 0x0205
     const val PUSH = 0x0204 // from the buds, seq FF: <event code> ...
@@ -20,6 +21,7 @@ object Cmd {
     const val BIT_ANC = 8
     const val BIT_SUBSCRIBE = 22
 
+    const val EVENT_BATTERY = 0x01 // push: 01 <count> (<part> <raw>)*
     const val EVENT_ANC = 0x03
 }
 
@@ -48,10 +50,17 @@ object Payloads {
     }
 }
 
+enum class BudPart(val id: Int) { LEFT(1), RIGHT(2), CASE(3) }
+
+data class Battery(val level: Int, val charging: Boolean)
+
 /** Something the buds said that the app cares about. */
 sealed interface Event {
     data class Mode(val state: NoiseState) : Event
     data class SmartPick(val level: AncLevel) : Event
+
+    /** Only the parts the buds reported: a closed case, or a bud in it, may be left out. */
+    data class Batteries(val parts: Map<BudPart, Battery>) : Event
 }
 
 object Decode {
@@ -79,6 +88,35 @@ object Decode {
         if (payload.size < 2 || payload[0].toInt() != 0) return emptyList()
         val count = payload[1].toInt() and 0xFF
         return (0 until minOf(count, payload.size - 2)).map { payload[2 + it].toInt() and 0xFF }
+    }
+
+    /** Every event [frame] carries, if any. */
+    fun event(frame: Frame): Event? = anc(frame) ?: battery(frame)
+
+    /**
+     * A `0x8106` reply (`00 <count> pairs`) or a battery push (`01 <count> pairs`). Each pair is
+     * `<part 1 left, 2 right, 3 case> <raw>`: level = raw & 7F, bit 7 = charging, FF = unknown.
+     */
+    fun battery(frame: Frame): Event.Batteries? {
+        val p = frame.payload
+        val lead = when (frame.cmd) {
+            Cmd.BATTERY or Cmd.REPLY -> Status.OK
+            Cmd.PUSH -> Cmd.EVENT_BATTERY
+            else -> return null
+        }
+        if (p.size < 2 || p[0].toInt() != lead) return null
+        val count = p[1].toInt() and 0xFF
+        if (count == 0 || p.size != 2 + 2 * count) return null
+        val parts = HashMap<BudPart, Battery>()
+        for (i in 0 until count) {
+            val part = BudPart.entries.firstOrNull { it.id == (p[2 + 2 * i].toInt() and 0xFF) } ?: return null
+            val raw = p[3 + 2 * i].toInt() and 0xFF
+            if (raw == 0xFF) continue
+            val level = raw and 0x7F
+            if (level > 100) return null
+            parts[part] = Battery(level, raw and 0x80 != 0)
+        }
+        return Event.Batteries(parts)
     }
 
     /**

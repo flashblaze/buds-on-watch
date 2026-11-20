@@ -12,14 +12,14 @@ package dev.flashblaze.heymelodywatch.protocol
  * | Off            | 0       | 0, 3        |
  * | ANC last level | 1       | 1           |
  * | Transparency   | 2       | 2, 8, 9     |
- * | Deep           | 4       | 4           |
+ * | High           | 4       | 4           |
  * | Medium         | 5       | 5           |
  * | Light          | 6       | 6           |
  * | Smart          | 7       | 7           |
  */
 enum class AncLevel(val setBit: Int) {
     SMART(7),
-    DEEP(4),
+    HIGH(4),
     MEDIUM(5),
     LIGHT(6),
 }
@@ -50,7 +50,7 @@ data class NoiseState(val mode: NoiseMode, val level: AncLevel? = null) {
                 0, 3 -> NoiseState(NoiseMode.OFF)
                 1 -> NoiseState(NoiseMode.ANC)
                 2, 8, 9 -> NoiseState(NoiseMode.TRANSPARENCY)
-                4 -> NoiseState(NoiseMode.ANC, AncLevel.DEEP)
+                4 -> NoiseState(NoiseMode.ANC, AncLevel.HIGH)
                 5 -> NoiseState(NoiseMode.ANC, AncLevel.MEDIUM)
                 6 -> NoiseState(NoiseMode.ANC, AncLevel.LIGHT)
                 7 -> NoiseState(NoiseMode.ANC, AncLevel.SMART)
@@ -80,8 +80,8 @@ object Models {
     const val BUDS_PRO_3 = "064014"
 
     fun levels(productId: String?): List<AncLevel> = when (productId) {
-        // HeyMelody's tree for 064014: noise reduction -> Smart 7, Deep 4, Medium 5, Light 6.
-        BUDS_PRO_3 -> listOf(AncLevel.SMART, AncLevel.DEEP, AncLevel.MEDIUM, AncLevel.LIGHT)
+        // HeyMelody's tree for 064014: noise reduction -> Smart 7, strong 4, middle 5, weak 6.
+        BUDS_PRO_3 -> listOf(AncLevel.SMART, AncLevel.HIGH, AncLevel.MEDIUM, AncLevel.LIGHT)
         else -> emptyList()
     }
 }

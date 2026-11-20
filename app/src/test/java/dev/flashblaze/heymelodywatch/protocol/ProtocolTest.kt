@@ -27,7 +27,7 @@ class ProtocolTest {
         assertEquals("01 01 01", set(NoiseState(NoiseMode.OFF)))
         assertEquals("01 01 02", set(NoiseState(NoiseMode.ANC)))
         assertEquals("01 01 04", set(NoiseState(NoiseMode.TRANSPARENCY)))
-        assertEquals("01 01 10", set(NoiseState(NoiseMode.ANC, AncLevel.DEEP)))
+        assertEquals("01 01 10", set(NoiseState(NoiseMode.ANC, AncLevel.HIGH)))
         assertEquals("01 01 20", set(NoiseState(NoiseMode.ANC, AncLevel.MEDIUM)))
         assertEquals("01 01 40", set(NoiseState(NoiseMode.ANC, AncLevel.LIGHT)))
         assertEquals("01 01 80", set(NoiseState(NoiseMode.ANC, AncLevel.SMART)))
@@ -77,8 +77,30 @@ class ProtocolTest {
         assertNull(push("01 03 01 50 02 50 03 40"))
 
         val reply = Decode.anc(Frame(Cmd.ANC_READ or Cmd.REPLY, 0x07, hex("00 01 01 10 00")))
-        assertEquals(Event.Mode(NoiseState(NoiseMode.ANC, AncLevel.DEEP)), reply)
+        assertEquals(Event.Mode(NoiseState(NoiseMode.ANC, AncLevel.HIGH)), reply)
         assertNull(Decode.anc(Frame(Cmd.ANC_READ or Cmd.REPLY, 0x07, hex("01 01 01 10 00"))))
+    }
+
+    @Test
+    fun `battery replies and pushes`() {
+        // Pushes captured from a Buds Pro 3 on the watch: left charging at 100 (E4), case 40 (28).
+        assertEquals(
+            mapOf(
+                BudPart.LEFT to Battery(100, charging = true),
+                BudPart.RIGHT to Battery(100, charging = false),
+                BudPart.CASE to Battery(40, charging = false),
+            ),
+            Decode.event(Frame(Cmd.PUSH, 0x22, hex("01 03 01 E4 02 64 03 28")))?.let { (it as Event.Batteries).parts },
+        )
+        // Case lid closed: only the buds are reported.
+        assertEquals(
+            setOf(BudPart.LEFT, BudPart.RIGHT),
+            Decode.battery(Frame(Cmd.PUSH, 0x25, hex("01 02 01 64 02 64")))?.parts?.keys,
+        )
+        val reply = Decode.battery(Frame(Cmd.BATTERY or Cmd.REPLY, 0x09, hex("00 03 01 37 02 FF 03 C5")))
+        assertEquals(mapOf(BudPart.LEFT to Battery(55, false), BudPart.CASE to Battery(69, true)), reply?.parts)
+        // Wear push (code 02) has the same shape and must not read as battery.
+        assertNull(Decode.event(Frame(Cmd.PUSH, 0x21, hex("02 03 01 04 02 05 03 04"))))
     }
 
     @Test
@@ -101,7 +123,7 @@ class ProtocolTest {
         assertEquals("065414", Decode.productId(hex("00 14 54 06"))) // OnePlus Buds 4 capture
         val pro3 = Decode.productId(hex("00 14 40 06"))
         assertEquals(Models.BUDS_PRO_3, pro3)
-        assertEquals(listOf(AncLevel.SMART, AncLevel.DEEP, AncLevel.MEDIUM, AncLevel.LIGHT), Models.levels(pro3))
+        assertEquals(listOf(AncLevel.SMART, AncLevel.HIGH, AncLevel.MEDIUM, AncLevel.LIGHT), Models.levels(pro3))
         // Unknown model: no level bits are offered.
         assertTrue(Models.levels("065414").isEmpty())
         assertNull(Decode.productId(hex("01 14 40 06")))
