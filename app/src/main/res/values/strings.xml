@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">Buds ANC</string>
+
+    <string name="mode_off">Off</string>
+    <string name="mode_anc">Noise cancelling</string>
+    <string name="mode_transparency">Transparency</string>
+    <string name="level_smart">Smart</string>
+    <string name="level_deep">Deep</string>
+    <string name="level_medium">Medium</string>
+    <string name="level_light">Light</string>
+    <string name="anc_with_level">Noise cancelling · %1$s</string>
+    <string name="anc_level">ANC level</string>
+    <string name="smart_picked">Using %1$s</string>
+    <string name="switching">Switching…</string>
+    <string name="unknown_mode">Unknown</string>
+
+    <string name="buds">Buds</string>
+    <string name="connecting">Connecting…</string>
+    <string name="last_known">Last known: %1$s</string>
+    <string name="no_permission">Allow Nearby devices so the watch can talk to your buds</string>
+    <string name="allow">Allow</string>
+    <string name="open_settings">Settings</string>
+    <string name="bluetooth_off">Bluetooth is off</string>
+    <string name="not_paired">Pair your buds with this watch in Settings › Connections › Bluetooth, then come back</string>
+    <string name="failed">Couldn\'t reach %1$s. Take them out of the case and check they\'re connected to the watch.</string>
+    <string name="unsupported">%1$s don\'t offer noise control</string>
+    <string name="retry">Retry</string>
+    <string name="choose_buds">Choose buds</string>
+    <string name="paired_headphones">Paired headphones</string>
+    <string name="no_headphones">No headphones paired with this watch</string>
+
+    <string name="notice_not_worn">Put a bud in your ear first</string>
+    <string name="notice_refused">The buds refused that mode</string>
+    <string name="notice_no_reply">No answer from the buds</string>
+
+    <string name="tile_label">Noise control</string>
+    <string name="tile_description">Switch noise cancelling on your OnePlus buds</string>
+    <string name="tile_off">Off</string>
+    <string name="tile_anc">ANC</string>
+    <string name="tile_transparency">Trans</string>
+    <string name="tile_open_app">Open the app to connect</string>
+    <string name="tile_unreachable">Buds not reachable</string>
+</resources>

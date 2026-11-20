@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- An earbud inside a sound-blocking ring. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#FF0B1D3A"
+        android:pathData="M0,0H48V48H0Z" />
+    <path
+        android:strokeColor="#FFA8C7FA"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M24,8A16,16 0,1 1,23.99 8" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M21,16a6,6 0,0 1,9 5v3a6,6 0,0 1,-5 6v4a2,2 0,0 1,-4 0z" />
+</vector>

@@ -1,0 +1,173 @@
+package dev.flashblaze.heymelodywatch
+
+import androidx.wear.protolayout.ActionBuilders
+import androidx.wear.protolayout.ColorBuilders.argb
+import androidx.wear.protolayout.DimensionBuilders.dp
+import androidx.wear.protolayout.DimensionBuilders.expand
+import androidx.wear.protolayout.DimensionBuilders.sp
+import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.LayoutElementBuilders.Box
+import androidx.wear.protolayout.LayoutElementBuilders.Column
+import androidx.wear.protolayout.LayoutElementBuilders.FontStyle
+import androidx.wear.protolayout.LayoutElementBuilders.Row
+import androidx.wear.protolayout.LayoutElementBuilders.Spacer
+import androidx.wear.protolayout.LayoutElementBuilders.Text
+import androidx.wear.protolayout.ModifiersBuilders.Background
+import androidx.wear.protolayout.ModifiersBuilders.Clickable
+import androidx.wear.protolayout.ModifiersBuilders.Corner
+import androidx.wear.protolayout.ModifiersBuilders.Modifiers
+import androidx.wear.protolayout.ResourceBuilders
+import androidx.wear.protolayout.TimelineBuilders
+import androidx.wear.tiles.RequestBuilders
+import androidx.wear.tiles.TileBuilders
+import androidx.wear.tiles.TileService
+import com.google.common.util.concurrent.Futures
+import com.google.common.util.concurrent.ListenableFuture
+import dev.flashblaze.heymelodywatch.protocol.NoiseMode
+import dev.flashblaze.heymelodywatch.protocol.NoiseState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.guava.future
+import kotlinx.coroutines.withTimeoutOrNull
+
+/**
+ * Off / ANC / Transparency buttons. A tap is a LoadAction: the tile host calls [onTileRequest] with
+ * the button's id, which opens a short session, sets the mode, reads it back and draws the result.
+ */
+class NoiseTileService : TileService() {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    override fun onDestroy() {
+        scope.cancel()
+        super.onDestroy()
+    }
+
+    override fun onTileRequest(requestParams: RequestBuilders.TileRequest): ListenableFuture<TileBuilders.Tile> =
+        scope.future {
+            val buds = Buds.get(this@NoiseTileService)
+            val target = NoiseMode.entries.firstOrNull { CLICK_PREFIX + it.name == requestParams.currentState.lastClickableId }
+            var problem: Int? = null
+            if (target != null) {
+                problem = when {
+                    !buds.hasPermission() -> R.string.tile_open_app
+                    withTimeoutOrNull(SET_TIMEOUT_MS) { buds.session { setMode(NoiseState(target)) } } != true ->
+                        R.string.tile_unreachable
+                    else -> buds.state.value.notice?.labelRes()
+                }
+            }
+            tile(buds.state.value.noise, problem)
+        }
+
+    override fun onTileResourcesRequest(
+        requestParams: RequestBuilders.ResourcesRequest,
+    ): ListenableFuture<ResourceBuilders.Resources> =
+        Futures.immediateFuture(ResourceBuilders.Resources.Builder().setVersion(RESOURCES_VERSION).build())
+
+    private fun tile(noise: NoiseState?, problem: Int?): TileBuilders.Tile {
+        val openApp = Clickable.Builder()
+            .setId("open")
+            .setOnClick(
+                ActionBuilders.LaunchAction.Builder()
+                    .setAndroidActivity(
+                        ActionBuilders.AndroidActivity.Builder()
+                            .setPackageName(packageName)
+                            .setClassName(MainActivity::class.java.name)
+                            .build(),
+                    )
+                    .build(),
+            )
+            .build()
+
+        val buttons = Row.Builder()
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .addContent(button(NoiseMode.OFF, R.string.tile_off, noise))
+            .addContent(gap(6f))
+            .addContent(button(NoiseMode.ANC, R.string.tile_anc, noise))
+            .addContent(gap(6f))
+            .addContent(button(NoiseMode.TRANSPARENCY, R.string.tile_transparency, noise))
+            .build()
+
+        val column = Column.Builder()
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setModifiers(Modifiers.Builder().setClickable(openApp).build())
+            .addContent(text(getString(R.string.tile_label), 13f, MUTED))
+            .addContent(text(noise.label(this), 15f, WHITE, bold = true))
+            .addContent(Spacer.Builder().setHeight(dp(10f)).build())
+            .addContent(buttons)
+        if (problem != null) {
+            column.addContent(Spacer.Builder().setHeight(dp(8f)).build())
+            column.addContent(text(getString(problem), 12f, WARNING))
+        }
+
+        val root = Box.Builder()
+            .setWidth(expand())
+            .setHeight(expand())
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .addContent(column.build())
+            .build()
+
+        return TileBuilders.Tile.Builder()
+            .setResourcesVersion(RESOURCES_VERSION)
+            .setTileTimeline(TimelineBuilders.Timeline.fromLayoutElement(root))
+            .build()
+    }
+
+    private fun button(mode: NoiseMode, label: Int, noise: NoiseState?): LayoutElementBuilders.LayoutElement {
+        val selected = noise?.mode == mode
+        val click = Clickable.Builder()
+            .setId(CLICK_PREFIX + mode.name)
+            .setOnClick(ActionBuilders.LoadAction.Builder().build())
+            .build()
+        return Box.Builder()
+            .setWidth(dp(BUTTON_SIZE))
+            .setHeight(dp(BUTTON_SIZE))
+            .setHorizontalAlignment(LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER)
+            .setVerticalAlignment(LayoutElementBuilders.VERTICAL_ALIGN_CENTER)
+            .setModifiers(
+                Modifiers.Builder()
+                    .setClickable(click)
+                    .setBackground(
+                        Background.Builder()
+                            .setColor(argb(if (selected) ACCENT else SURFACE))
+                            .setCorner(Corner.Builder().setRadius(dp(BUTTON_SIZE / 2)).build())
+                            .build(),
+                    )
+                    .build(),
+            )
+            .addContent(text(getString(label), 13f, if (selected) ON_ACCENT else WHITE, bold = selected))
+            .build()
+    }
+
+    private fun text(value: String, size: Float, color: Int, bold: Boolean = false) =
+        Text.Builder()
+            .setText(value)
+            .setMaxLines(2)
+            .setFontStyle(
+                FontStyle.Builder()
+                    .setSize(sp(size))
+                    .setColor(argb(color))
+                    .setWeight(
+                        if (bold) LayoutElementBuilders.FONT_WEIGHT_BOLD else LayoutElementBuilders.FONT_WEIGHT_NORMAL,
+                    )
+                    .build(),
+            )
+            .build()
+
+    private fun gap(width: Float) = Spacer.Builder().setWidth(dp(width)).build()
+
+    private companion object {
+        const val RESOURCES_VERSION = "1"
+        const val CLICK_PREFIX = "set:"
+        const val SET_TIMEOUT_MS = 25_000L
+        const val BUTTON_SIZE = 52f
+        const val WHITE = 0xFFFFFFFF.toInt()
+        const val MUTED = 0xFFB0B0B8.toInt()
+        const val WARNING = 0xFFFFB74D.toInt()
+        const val SURFACE = 0xFF2A2A33.toInt()
+        const val ACCENT = 0xFFA8C7FA.toInt()
+        const val ON_ACCENT = 0xFF062E6F.toInt()
+    }
+}

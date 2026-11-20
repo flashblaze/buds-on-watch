@@ -1,0 +1,31 @@
+package dev.flashblaze.heymelodywatch
+
+import android.content.Context
+import dev.flashblaze.heymelodywatch.protocol.AncLevel
+import dev.flashblaze.heymelodywatch.protocol.NoiseMode
+import dev.flashblaze.heymelodywatch.protocol.NoiseState
+
+fun AncLevel.labelRes(): Int = when (this) {
+    AncLevel.SMART -> R.string.level_smart
+    AncLevel.DEEP -> R.string.level_deep
+    AncLevel.MEDIUM -> R.string.level_medium
+    AncLevel.LIGHT -> R.string.level_light
+}
+
+fun NoiseMode.labelRes(): Int = when (this) {
+    NoiseMode.OFF -> R.string.mode_off
+    NoiseMode.ANC -> R.string.mode_anc
+    NoiseMode.TRANSPARENCY -> R.string.mode_transparency
+}
+
+fun NoiseState?.label(context: Context): String = when {
+    this == null -> context.getString(R.string.unknown_mode)
+    level != null -> context.getString(R.string.anc_with_level, context.getString(level.labelRes()))
+    else -> context.getString(mode.labelRes())
+}
+
+fun Notice.labelRes(): Int = when (this) {
+    Notice.NOT_WORN -> R.string.notice_not_worn
+    Notice.REFUSED -> R.string.notice_refused
+    Notice.NO_REPLY -> R.string.notice_no_reply
+}
