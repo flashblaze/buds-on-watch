@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch.protocol
+package dev.flashblaze.budsonwatch.protocol
 
 /**
  * One whole OPPO/OnePlus "OPOv1" message (the HeyMelody RFCOMM protocol):

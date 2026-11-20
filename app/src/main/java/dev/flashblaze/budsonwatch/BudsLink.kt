@@ -1,14 +1,14 @@
-package dev.flashblaze.heymelodywatch
+package dev.flashblaze.budsonwatch
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothSocket
 import android.util.Log
-import dev.flashblaze.heymelodywatch.protocol.Decode
-import dev.flashblaze.heymelodywatch.protocol.Event
-import dev.flashblaze.heymelodywatch.protocol.Frame
-import dev.flashblaze.heymelodywatch.protocol.Framer
-import dev.flashblaze.heymelodywatch.protocol.toHex
+import dev.flashblaze.budsonwatch.protocol.Decode
+import dev.flashblaze.budsonwatch.protocol.Event
+import dev.flashblaze.budsonwatch.protocol.Frame
+import dev.flashblaze.budsonwatch.protocol.Framer
+import dev.flashblaze.budsonwatch.protocol.toHex
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

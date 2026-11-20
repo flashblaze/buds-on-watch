@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch
+package dev.flashblaze.budsonwatch
 
 import android.Manifest
 import android.content.Intent
@@ -60,10 +60,10 @@ import androidx.wear.compose.material3.TextToggleButton
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
-import dev.flashblaze.heymelodywatch.protocol.AncLevel
-import dev.flashblaze.heymelodywatch.protocol.BudPart
-import dev.flashblaze.heymelodywatch.protocol.NoiseMode
-import dev.flashblaze.heymelodywatch.protocol.NoiseState
+import dev.flashblaze.budsonwatch.protocol.AncLevel
+import dev.flashblaze.budsonwatch.protocol.BudPart
+import dev.flashblaze.budsonwatch.protocol.NoiseMode
+import dev.flashblaze.budsonwatch.protocol.NoiseState
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

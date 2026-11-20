@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch.protocol
+package dev.flashblaze.budsonwatch.protocol
 
 /**
  * The noise-control and battery subset of the protocol (QuickBuds docs/PROTOCOL.md §5, §6, §10, §14).

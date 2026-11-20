@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch.protocol
+package dev.flashblaze.budsonwatch.protocol
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals

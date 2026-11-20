@@ -1,9 +1,9 @@
-package dev.flashblaze.heymelodywatch
+package dev.flashblaze.budsonwatch
 
 import android.content.Context
-import dev.flashblaze.heymelodywatch.protocol.AncLevel
-import dev.flashblaze.heymelodywatch.protocol.NoiseMode
-import dev.flashblaze.heymelodywatch.protocol.NoiseState
+import dev.flashblaze.budsonwatch.protocol.AncLevel
+import dev.flashblaze.budsonwatch.protocol.NoiseMode
+import dev.flashblaze.budsonwatch.protocol.NoiseState
 
 fun AncLevel.labelRes(): Int = when (this) {
     AncLevel.SMART -> R.string.level_smart

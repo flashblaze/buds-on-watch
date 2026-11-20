@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch
+package dev.flashblaze.budsonwatch
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -10,16 +10,16 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.util.Log
 import androidx.wear.tiles.TileService
-import dev.flashblaze.heymelodywatch.protocol.AncLevel
-import dev.flashblaze.heymelodywatch.protocol.Battery
-import dev.flashblaze.heymelodywatch.protocol.BudPart
-import dev.flashblaze.heymelodywatch.protocol.Cmd
-import dev.flashblaze.heymelodywatch.protocol.Decode
-import dev.flashblaze.heymelodywatch.protocol.Event
-import dev.flashblaze.heymelodywatch.protocol.Models
-import dev.flashblaze.heymelodywatch.protocol.NoiseState
-import dev.flashblaze.heymelodywatch.protocol.Payloads
-import dev.flashblaze.heymelodywatch.protocol.Status
+import dev.flashblaze.budsonwatch.protocol.AncLevel
+import dev.flashblaze.budsonwatch.protocol.Battery
+import dev.flashblaze.budsonwatch.protocol.BudPart
+import dev.flashblaze.budsonwatch.protocol.Cmd
+import dev.flashblaze.budsonwatch.protocol.Decode
+import dev.flashblaze.budsonwatch.protocol.Event
+import dev.flashblaze.budsonwatch.protocol.Models
+import dev.flashblaze.budsonwatch.protocol.NoiseState
+import dev.flashblaze.budsonwatch.protocol.Payloads
+import dev.flashblaze.budsonwatch.protocol.Status
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

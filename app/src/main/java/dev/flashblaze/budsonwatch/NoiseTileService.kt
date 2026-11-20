@@ -1,4 +1,4 @@
-package dev.flashblaze.heymelodywatch
+package dev.flashblaze.budsonwatch
 
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders.argb
@@ -23,9 +23,9 @@ import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import dev.flashblaze.heymelodywatch.protocol.AncLevel
-import dev.flashblaze.heymelodywatch.protocol.NoiseMode
-import dev.flashblaze.heymelodywatch.protocol.NoiseState
+import dev.flashblaze.budsonwatch.protocol.AncLevel
+import dev.flashblaze.budsonwatch.protocol.NoiseMode
+import dev.flashblaze.budsonwatch.protocol.NoiseState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
