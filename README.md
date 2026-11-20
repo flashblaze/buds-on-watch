@@ -1,4 +1,4 @@
-# Hey Melody Watch
+# Buds on Watch
 
 A Wear OS app that controls the noise cancelling of **OnePlus Buds Pro 3** straight from a **Galaxy Watch 8**, and shows the battery of both buds and the case. No phone app is involved: the watch talks to the buds over Bluetooth itself, while the phone keeps playing audio to them.
 
@@ -140,7 +140,7 @@ Each tile button is a `LoadAction` with an id like `set:HIGH`. The system calls 
 ## Code map
 
 ```
-app/src/main/java/dev/flashblaze/heymelodywatch/
+app/src/main/java/dev/flashblaze/budsonwatch/
 ├── protocol/
 │   ├── Frame.kt          frame encoding, streaming Framer
 │   ├── Anc.kt            modes, levels, set/report bits, per-model level table

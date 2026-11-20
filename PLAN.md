@@ -1,4 +1,4 @@
-# Hey Melody Watch: noise control for OnePlus Buds Pro 3 on Galaxy Watch 8
+# Buds on Watch: noise control for OnePlus Buds Pro 3 on Galaxy Watch 8
 
 Scope: read and set the noise-control mode (Off / Transparency / ANC + ANC level) of OnePlus Buds Pro 3 from a Galaxy Watch 8, and show left / right / case battery. Nothing else (no EQ, gestures).
 
@@ -81,7 +81,7 @@ No Adaptive (`0x0800`) on Buds Pro 3. Decode the report by lowest set bit; never
 
 ## 4. App design
 
-One Gradle module, `:app` (`dev.flashblaze.heymelodywatch`). Reference implementation read: WearEars `oppo/OppoOpoClient.java` (cloned at `~/Projects/WearEars`).
+One Gradle module, `:app` (`dev.flashblaze.budsonwatch`). Reference implementation read: WearEars `oppo/OppoOpoClient.java` (cloned at `~/Projects/WearEars`).
 
 | File | Role |
 |---|---|

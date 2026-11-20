@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.flashblaze.heymelodywatch"
+    namespace = "dev.flashblaze.budsonwatch"
     compileSdk = 37 // current Compose requires it; runtime behavior follows targetSdk
 
     defaultConfig {
-        applicationId = "dev.flashblaze.heymelodywatch"
+        applicationId = "dev.flashblaze.budsonwatch"
         minSdk = 30 // Wear OS 3
         targetSdk = 36 // Wear OS 6 (Galaxy Watch8)
         versionCode = 1
